@@ -1,0 +1,48 @@
+<MainScreen>:
+    #: import time __main__.time
+    change: change
+    motorSlider: motorSlider
+    name: 'main'
+    direction: direction
+    FloatLayout:
+        size_hint: None, None
+
+    Slider:
+        id: motorSlider
+        on_value: root.Accell()
+        min: 0
+        max: 100
+        step: 1
+        orientation: 'horizontal'
+        x: root.width * 0
+        y: root.height * 0.35
+
+
+
+    DPEAButton:
+        id: change
+        text: "On"
+        size: 100, 100
+        x: root.width * 0.75
+        y: root.height * 0.25
+        color: 0, 1, 0, 1
+        on_press: root.motorToggle()
+
+    DPEAButton:
+        id: direction
+        text: "Left"
+        size: 100, 100
+        x: root.width * 0.25
+        y: root.height * 0.25
+        color: 0, 1, 0, 1
+        on_press: root.motorToggle2()
+
+
+
+
+
+
+
+
+
+
