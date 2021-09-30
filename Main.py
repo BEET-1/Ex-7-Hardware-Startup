@@ -38,7 +38,7 @@ SCREEN_MANAGER = ScreenManager()
 MAIN_SCREEN_NAME = 'main'
 ADMIN_SCREEN_NAME = 'admin'
 
-s0 = stepper(port=0, micro_steps=32, hold_current=20, run_current=20, accel_current=20, deaccel_current=20,
+s0 = stepper(port=3, micro_steps=32, hold_current=20, run_current=20, accel_current=20, deaccel_current=20,
                  steps_per_unit=200, speed=8)
 
 class ProjectNameGUI(App):
@@ -106,12 +106,35 @@ class MainScreen(Screen):
 
         if self.OnOff2 == True:
             s0.softStop()
-            s0.go_until_press(0, self.motorSlider.value * 1000)
+            s0.go_until_press(0, int(self.motorSlider.value * 500))
 
 
         else:
             s0.softStop()
-            s0.go_until_press(1, self.motorSlider.value * 1000)
+            s0.go_until_press(1, int(self.motorSlider.value * 500))
+
+    def start_showtime_thread(self):
+        Thread(target=self.showtime).start()
+
+    def showtime(self):
+        print(str(s0.get_position_in_units()))
+        s0.set_speed(1.0)
+        s0.relative_move(15.0)
+        self.pos1.text = str(s0.get_position_in_units())
+        sleep(10.0)
+        s0.set_speed(5.0)
+        s0.relative_move(10.0)
+        self.pos1.text = str(s0.get_position_in_units())
+        sleep(8.0)
+        s0.relative_move(-25.0)
+        sleep(30.0)
+        s0.set_speed(8.0)
+        s0.relative_move(-100.0)
+        while s0.isBusy() == True:
+            sleep(0.01)
+        self.pos1.text = str(s0.get_position_in_units())
+        s0.relative_move(100.0)
+
 
 
 
