@@ -3,6 +3,7 @@ import os
 #os.environ['DISPLAY'] = ":0.0"
 #os.environ['KIVY_WINDOW'] = 'egl_rpi'
 import spidev
+from pidev.Cyprus_Commands import Cyprus_Commands_RPi as cyprus
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.lang import Builder
@@ -37,7 +38,9 @@ MIXPANEL = MixPanel("Project Name", MIXPANEL_TOKEN)
 SCREEN_MANAGER = ScreenManager()
 MAIN_SCREEN_NAME = 'main'
 ADMIN_SCREEN_NAME = 'admin'
-
+cyprus.initialize()
+cyprus.setup_servo(1)
+cyprus.set_servo_position(1, 0)
 s0 = stepper(port=3, micro_steps=32, hold_current=20, run_current=20, accel_current=20, deaccel_current=20,
                  steps_per_unit=200, speed=8)
 
@@ -75,14 +78,14 @@ class MainScreen(Screen):
     def motorToggle(self):
         if self.OnOff == True:
             self.motor = "off"
-            s0.go_until_press(0, 6400)
+            cyprus.set_pwm_values(2, period_value=100000, compare_value=10000, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
             self.change.text = self.motor
             self.OnOff = False
             return
         else:
             self.motor = "on"
             self.change.text = self.motor
-            s0.softStop()
+            cyprus.set_pwm_values(2, period_value=100000, compare_value=0, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
             self.OnOff = True
             return
 
@@ -134,6 +137,68 @@ class MainScreen(Screen):
             sleep(0.01)
         self.pos1.text = str(s0.get_position_in_units())
         s0.relative_move(100.0)
+
+    stateCheck = True
+    def switchStates(self):
+        cyprus.set_pwm_values(2, period_value=100000, compare_value=1000, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+        sleep(2.0)
+        cyprus.set_pwm_values(2, period_value=100000, compare_value=2000, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+        sleep(2.0)
+        cyprus.set_pwm_values(2, period_value=100000, compare_value=3000, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+        sleep(2.0)
+        cyprus.set_pwm_values(2, period_value=100000, compare_value=4000, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+        sleep(2.0)
+        cyprus.set_pwm_values(2, period_value=100000, compare_value=5000, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+        sleep(2.0)
+        cyprus.set_pwm_values(2, period_value=100000, compare_value=6000, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+        sleep(2.0)
+        cyprus.set_pwm_values(2, period_value=100000, compare_value=7000, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+        sleep(2.0)
+        cyprus.set_pwm_values(2, period_value=100000, compare_value=8000, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+        sleep(2.0)
+        cyprus.set_pwm_values(2, period_value=100000, compare_value=9000, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+        sleep(2.0)
+        cyprus.set_pwm_values(2, period_value=100000, compare_value=10000, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+        sleep(2.0)
+        cyprus.set_pwm_values(2, period_value=100000, compare_value=0, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+
+
+
+
+
+
+    pos3= 0
+    def buttonSense(self):
+
+        while True:
+            if self.pos3 == 0:
+                if cyprus.read_gpio() & 0b0001 == 0:
+                    cyprus.set_pwm_values(2, period_value=100000, compare_value=10000, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+                    self.pos3 = 1
+            else:
+                if cyprus.read_gpio() & 0b0001 == 0:
+                    cyprus.set_pwm_values(2, period_value=100000, compare_value=0, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+                    self.pos3 = 0
+            sleep(1.0)
+    def start_button_thread(self):
+        Thread(target=self.buttonSense).start()
+
+    pos4 = 0
+    def buttonSense2(self):
+
+        while True:
+            if self.pos4 == 0:
+                if cyprus.read_gpio() & 0b0010 == 0:
+                    cyprus.set_servo_position(2, 1)
+                    self.pos4 = 1
+            else:
+                if cyprus.read_gpio() & 0b0010 == 0:
+                        cyprus.set_servo_position(2, 0.5)
+                        self.pos4 = 0
+            sleep(1.0)
+
+    def start_button_thread2(self):
+        Thread(target=self.buttonSense2).start()
 
 
 

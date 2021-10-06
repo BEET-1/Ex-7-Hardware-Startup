@@ -5,6 +5,7 @@
     name: 'main'
     pos1: pos1
     direction: direction
+    on_enter: root.start_button_thread()
     FloatLayout:
         size_hint: None, None
 
@@ -47,7 +48,14 @@
         color: 0, 1, 0, 1
         on_press: root.start_showtime_thread()
 
-
+    DPEAButton:
+        id: states
+        text: "State"
+        size: 100, 100
+        x: root.width * 0.4
+        y: root.height * 0.4
+        color: 0, 1, 0, 1
+        on_press: root.switchStates()
 
     DPEAButton:
         id: pos1
